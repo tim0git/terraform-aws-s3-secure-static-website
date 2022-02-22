@@ -28,10 +28,16 @@ variable "geo_restrictions" {
   description = "restriction_type (Required) - The method that you want to use to restrict distribution of your content by country: none, whitelist, or blacklist. locations (Optional) - The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist)."
 }
 
-variable "web_acl_id" {
+variable "aws_waf_arn" {
   type        = string
   default     = null
   description = "The ID of the AWS WAF web ACL to associate with the distribution"
+}
+
+variable "aliases" {
+  type        = list(string)
+  default     = []
+  description = "The domain names that you want to use as aliases for the distribution"
 }
 
 variable "upload_sample_file" {
