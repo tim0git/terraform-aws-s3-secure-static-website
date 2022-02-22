@@ -56,7 +56,7 @@ resource "aws_route53_record" "route53_record" {
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
-  aliases = local.domain_name
+  aliases = concat(local.domain_name, var.aliases)
 
   depends_on = [
     aws_s3_bucket.s3_bucket
@@ -145,7 +145,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     response_page_path    = "/"
   }
 
-  web_acl_id = var.web_acl_id
+  web_acl_id = var.aws_waf_arn
   wait_for_deployment = false
   tags                = var.tags
 }
