@@ -16,6 +16,12 @@ variable "acm_certificate_domain" {
   description = "Domain of the ACM certificate"
 }
 
+variable "default_root_object" {
+  type        = string
+  default     = "index.html"
+  description = "Default root object"
+}
+
 variable "price_class" {
   type        = string
   default     = "PriceClass_100" // Only US,Canada,Europe
@@ -26,6 +32,18 @@ variable "geo_restrictions" {
   type        = any
   default     = []
   description = "restriction_type (Required) - The method that you want to use to restrict distribution of your content by country: none, whitelist, or blacklist. locations (Optional) - The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist)."
+}
+
+variable "s3_log_bucket" {
+  type        = string
+  default     = ""
+  description = "S3 bucket for logs"
+}
+
+variable "include_cookies" {
+  type        = bool
+  default     = false
+  description = "Include cookies in logs"
 }
 
 variable "aws_waf_arn" {
@@ -50,6 +68,12 @@ variable "use_default_domain" {
   type        = bool
   default     = false
   description = "Use default domain name"
+}
+
+variable "aws_cloudfront_response_headers_policy_id" {
+  type        = string
+  default     = null
+  description = "Arn of the response headers policy to add to the distribution"
 }
 
 variable "tags" {
