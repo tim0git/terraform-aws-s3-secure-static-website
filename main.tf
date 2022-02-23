@@ -1,4 +1,5 @@
 locals {
+  logging_enabled = var.s3_log_bucket != "" ? [{}] : []
   geo_restrictions_enabled = var.geo_restrictions != [] ? [{}] : []
   geo_restrictions_disabled = var.geo_restrictions != [] ? [] : [{}]
   default_certs = var.use_default_domain ? ["default"] : []
@@ -62,6 +63,13 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     aws_s3_bucket.s3_bucket
   ]
 
+  enabled             = true
+  is_ipv6_enabled     = true
+  default_root_object = var.default_root_object
+  price_class = var.price_class
+  web_acl_id = var.aws_waf_arn
+  wait_for_deployment = false
+
   origin {
     domain_name = aws_s3_bucket.s3_bucket.bucket_regional_domain_name
     origin_id   = "s3-cloudfront-origin-identity"
@@ -70,10 +78,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
     }
   }
-
-  enabled             = true
-  is_ipv6_enabled     = true
-  default_root_object = "index.html"
 
   default_cache_behavior {
     allowed_methods = [
@@ -96,14 +100,49 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       }
     }
 
+    response_headers_policy_id = var.aws_cloudfront_response_headers_policy_id
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 86400
     max_ttl                = 31536000
   }
+  ordered_cache_behavior {
+    allowed_methods = [
+      "GET",
+      "HEAD",
+    ]
 
-  price_class = var.price_class
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
 
+    target_origin_id = "s3-cloudfront-origin-identity"
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    response_headers_policy_id = var.aws_cloudfront_response_headers_policy_id
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+    path_pattern               = "/${var.default_root_object}"
+  }
+
+  dynamic logging_config {
+    for_each = local.logging_enabled
+    content {
+      include_cookies = var.include_cookies
+      bucket          = var.s3_log_bucket
+      prefix          = replace(join(", ", reverse(split(".",local.domain_name[0]))), ", ", "/")
+    }
+  }
 
   dynamic restrictions {
     for_each = local.geo_restrictions_enabled
@@ -119,6 +158,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     content {
       geo_restriction {
         restriction_type = "none"
+        locations = []
       }
     }
   }
@@ -134,7 +174,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     content {
       acm_certificate_arn      = data.aws_acm_certificate.acm_cert[0].arn
       ssl_support_method       = "sni-only"
-      minimum_protocol_version = "TLSv1"
+      minimum_protocol_version = "TLSv1.2_2021"
     }
   }
 
@@ -145,8 +185,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     response_page_path    = "/"
   }
 
-  web_acl_id = var.aws_waf_arn
-  wait_for_deployment = false
   tags                = var.tags
 }
 
