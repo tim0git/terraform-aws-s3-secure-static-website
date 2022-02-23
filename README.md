@@ -12,6 +12,8 @@ Prerequisites (Optional in example2):
 
 - Route 53 hosted zone for example.com
 - ACM certificate for *.example.com in us-east-1 region
+- AWS Web Application Firewall ACL
+- Alternative domain names
 
 ### Example 1 Basic 
 ```hcl
