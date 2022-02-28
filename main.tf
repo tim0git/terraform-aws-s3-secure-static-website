@@ -5,6 +5,7 @@ locals {
   default_certs = var.use_default_domain ? ["default"] : []
   acm_certs     = var.use_default_domain ? [] : ["acm"]
   domain_name   = var.use_default_domain ? [] : [var.domain_name]
+  domain_names = concat(local.domain_name, var.aliases)
 }
 
 provider "aws" {
@@ -37,14 +38,14 @@ resource "aws_s3_object" "s3_bucket" {
 }
 
 resource "aws_route53_record" "route53_record" {
-  count = var.use_default_domain ? 0 : 1
+  count = length(local.domain_names)
 
   depends_on = [
     aws_cloudfront_distribution.s3_distribution
   ]
 
   zone_id = data.aws_route53_zone.domain_name[0].zone_id
-  name    = var.domain_name
+  name    = local.domain_names[count.index]
   type    = "A"
 
   alias {
