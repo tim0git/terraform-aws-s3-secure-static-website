@@ -4,8 +4,7 @@ locals {
   geo_restrictions_disabled = var.geo_restrictions != [] ? [] : [{}]
   default_certs = var.use_default_domain ? ["default"] : []
   acm_certs     = var.use_default_domain ? [] : ["acm"]
-  domain_name   = var.use_default_domain ? [] : [var.domain_name]
-  domain_names = concat(local.domain_name, var.aliases)
+  domain_names = concat([var.domain_name], var.aliases)
 }
 
 provider "aws" {
@@ -58,7 +57,7 @@ resource "aws_route53_record" "route53_record" {
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
-  aliases = concat(local.domain_name, var.aliases)
+  aliases = local.domain_names
 
   depends_on = [
     aws_s3_bucket.s3_bucket
@@ -141,7 +140,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     content {
       include_cookies = var.include_cookies
       bucket          = var.s3_log_bucket
-      prefix          = replace(join(", ", reverse(split(".",local.domain_name[0]))), ", ", "/")
+      prefix          = replace(join(", ", reverse(split(".",var.domain_name))), ", ", "/")
     }
   }
 
