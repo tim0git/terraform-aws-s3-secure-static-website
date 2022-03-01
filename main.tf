@@ -100,6 +100,15 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       }
     }
 
+    dynamic lambda_function_association {
+      for_each = var.lambda_function_associations
+      content {
+        event_type   = lambda_function_association.value.event_type
+        lambda_arn   = lambda_function_association.value.lambda_arn
+        include_body = lambda_function_association.value.include_body
+      }
+    }
+
     response_headers_policy_id = var.aws_cloudfront_response_headers_policy_id
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
@@ -124,6 +133,15 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
       cookies {
         forward = "none"
+      }
+    }
+
+    dynamic lambda_function_association {
+      for_each = var.lambda_function_associations
+      content {
+        event_type   = lambda_function_association.value.event_type
+        lambda_arn   = lambda_function_association.value.lambda_arn
+        include_body = lambda_function_association.value.include_body
       }
     }
 

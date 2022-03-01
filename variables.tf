@@ -76,6 +76,16 @@ variable "aws_cloudfront_response_headers_policy_id" {
   description = "Arn of the response headers policy to add to the distribution"
 }
 
+variable "lambda_function_associations" {
+  type = list(object({
+    lambda_arn = string
+    event_type = string
+    include_body = bool
+  }))
+  default     = []
+  description = "The IDs of the Lambda functions to associate with the distribution"
+}
+
 variable "tags" {
   default = {
     Name = "my-secure-s3-static-site"
