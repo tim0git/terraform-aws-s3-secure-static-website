@@ -76,6 +76,12 @@ variable "aws_cloudfront_response_headers_policy_id" {
   description = "Arn of the response headers policy to add to the distribution"
 }
 
+variable "compress"{
+  type        = bool
+  default     = true
+  description = "Enable gzip compression"
+}
+
 variable "lambda_function_associations" {
   type = list(object({
     lambda_arn = string

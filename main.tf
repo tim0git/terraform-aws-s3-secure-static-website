@@ -114,6 +114,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     min_ttl                = 0
     default_ttl            = 86400
     max_ttl                = 31536000
+    compress               = var.compress
   }
   ordered_cache_behavior {
     allowed_methods = [
@@ -150,7 +151,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     min_ttl                = 0
     default_ttl            = 0
     max_ttl                = 0
-    path_pattern               = "/${var.default_root_object}"
+    compress               = var.compress
+    path_pattern           = "/${var.default_root_object}"
   }
 
   dynamic logging_config {
