@@ -35,7 +35,7 @@ variable "geo_restrictions" {
 
 variable "s3_log_bucket" {
   type        = string
-  default     = ""
+  default     = null
   description = "S3 bucket for logs"
 }
 

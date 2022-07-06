@@ -1,5 +1,5 @@
 locals {
-  logging_enabled           = var.s3_log_bucket != "" ? [{}] : []
+  logging_enabled           = var.s3_log_bucket != null ? [{}] : []
   geo_restrictions_enabled  = var.geo_restrictions != [] ? [{}] : []
   geo_restrictions_disabled = var.geo_restrictions != [] ? [] : [{}]
   default_certs             = var.use_default_domain ? ["default"] : []
@@ -12,9 +12,24 @@ provider "aws" {
   alias  = "aws_cloudfront"
 }
 
+resource "aws_kms_key" "s3_bucket_key" {
+  description             = "This key is used to website encrypt bucket objects"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+}
+
 resource "aws_s3_bucket" "s3_bucket" {
   bucket = var.domain_name
   tags   = var.tags
+}
+
+resource "aws_s3_bucket_versioning" "s3_bucket_versioning" {
+  bucket  = aws_s3_bucket.s3_bucket.id
+  enabled = true
+  versioning_configuration {
+    mfa_delete = false
+    status     = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_acl" "s3_bucket" {
@@ -22,9 +37,29 @@ resource "aws_s3_bucket_acl" "s3_bucket" {
   acl    = "private"
 }
 
+resource "aws_s3_bucket_public_access_block" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_policy" "s3_bucket" {
   bucket = aws_s3_bucket.s3_bucket.id
   policy = data.aws_iam_policy_document.s3_bucket_policy.json
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.s3_bucket_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
 }
 
 resource "aws_s3_object" "s3_bucket" {
@@ -36,26 +71,15 @@ resource "aws_s3_object" "s3_bucket" {
   etag         = filemd5("${path.module}/Resources/index.html")
 }
 
-resource "aws_route53_record" "route53_record" {
-  count = length(local.domain_names)
+resource "aws_s3_bucket_logging" "s3_bucket" {
+  count  = local.logging_enabled ? 1 : 0
+  bucket = aws_s3_bucket.s3_bucket.id
 
-  depends_on = [
-    aws_cloudfront_distribution.s3_distribution
-  ]
-
-  zone_id = data.aws_route53_zone.domain_name[0].zone_id
-  name    = local.domain_names[count.index]
-  type    = "A"
-
-  alias {
-    name    = aws_cloudfront_distribution.s3_distribution.domain_name
-    zone_id = "Z2FDTNDATAQYW2"
-
-    //HardCoded value for CloudFront
-    evaluate_target_health = false
-  }
+  target_bucket = var.s3_log_bucket
+  target_prefix = "s3-access-logs/${var.domain_name}"
 }
 
+#tfsec:ignore:aws-cloudfront-enable-logging - logging is dynamic and triggered by input variables.
 resource "aws_cloudfront_distribution" "s3_distribution" {
   aliases = local.domain_names
 
@@ -210,4 +234,24 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = "access-identity-${var.domain_name}.s3.amazonaws.com"
+}
+
+resource "aws_route53_record" "route53_record" {
+  count = length(local.domain_names)
+
+  depends_on = [
+    aws_cloudfront_distribution.s3_distribution
+  ]
+
+  zone_id = data.aws_route53_zone.domain_name[0].zone_id
+  name    = local.domain_names[count.index]
+  type    = "A"
+
+  alias {
+    name    = aws_cloudfront_distribution.s3_distribution.domain_name
+    zone_id = "Z2FDTNDATAQYW2"
+
+    //HardCoded value for CloudFront
+    evaluate_target_health = false
+  }
 }
