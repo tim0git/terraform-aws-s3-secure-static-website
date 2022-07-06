@@ -6,6 +6,7 @@ locals {
   default_certs             = var.use_default_domain ? ["default"] : []
   acm_certs                 = var.use_default_domain ? [] : ["acm"]
   domain_names              = concat([var.domain_name], var.aliases)
+  create_route53_records    = var.use_default_domain ? false : true
 }
 
 provider "aws" {
@@ -237,7 +238,7 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
 }
 
 resource "aws_route53_record" "route53_record" {
-  count = length(local.domain_names)
+  count = local.create_route53_records ? length(local.domain_names): 0
 
   depends_on = [
     aws_cloudfront_distribution.s3_distribution
