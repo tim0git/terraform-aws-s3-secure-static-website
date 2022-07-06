@@ -1,19 +1,7 @@
 # terraform-aws-s3-secure-static-website
 Terraform module which creates secure s3 static website and all associated resources
-
-The following resources will be created
-
-- S3 Bucket
-- CloudFront distribution
-- Route53 record
-- Upload sample html file (optional)
-
-Prerequisites (Optional in example2):
-
-- Route 53 hosted zone for example.com
-- ACM certificate for *.example.com in us-east-1 region
-- AWS Web Application Firewall ACL
-- Alternative domain names
+<!-- BEGIN_TF_DOCS -->
+<!-- END_TF_DOCS -->
 
 ### Example 1 Basic 
 ```hcl
