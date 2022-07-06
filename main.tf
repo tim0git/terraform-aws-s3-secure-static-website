@@ -62,6 +62,23 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_bucket" {
   }
 }
 
+resource "aws_s3_bucket_public_access_block" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_logging" "example" {
+  count = local.logging_enabled ? 1 : 0
+  bucket = aws_s3_bucket.s3_bucket.id
+
+  target_bucket = var.s3_log_bucket
+  target_prefix = "s3-access-logs/${var.domain_name}"
+}
+
 resource "aws_route53_record" "route53_record" {
   count = length(local.domain_names)
 
