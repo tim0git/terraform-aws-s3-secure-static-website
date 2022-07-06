@@ -3,14 +3,17 @@ Terraform module which creates secure s3 static website and all associated resou
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
-| <a name="provider_aws.aws_cloudfront"></a> [aws.aws\_cloudfront](#provider\_aws.aws\_cloudfront) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4.0.0 |
+| <a name="provider_aws.aws_cloudfront"></a> [aws.aws\_cloudfront](#provider\_aws.aws\_cloudfront) | ~> 4.0.0 |
 
 ## Modules
 
@@ -45,7 +48,7 @@ No modules.
 | <a name="input_geo_restrictions"></a> [geo\_restrictions](#input\_geo\_restrictions) | restriction\_type (Required) - The method that you want to use to restrict distribution of your content by country: none, whitelist, or blacklist. locations (Optional) - The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist). | `any` | `[]` | no |
 | <a name="input_hosted_zone"></a> [hosted\_zone](#input\_hosted\_zone) | Route53 hosted zone | `string` | `null` | no |
 | <a name="input_include_cookies"></a> [include\_cookies](#input\_include\_cookies) | Include cookies in logs | `bool` | `false` | no |
-| <a name="input_lambda_function_associations"></a> [lambda\_function\_associations](#input\_lambda\_function\_associations) | The IDs of the Lambda functions to associate with the distribution | <pre>list(object({<br>    lambda_arn = string<br>    event_type = string<br>    include_body = bool<br>  }))</pre> | `[]` | no |
+| <a name="input_lambda_function_associations"></a> [lambda\_function\_associations](#input\_lambda\_function\_associations) | The IDs of the Lambda functions to associate with the distribution | <pre>list(object({<br>    lambda_arn   = string<br>    event_type   = string<br>    include_body = bool<br>  }))</pre> | `[]` | no |
 | <a name="input_price_class"></a> [price\_class](#input\_price\_class) | CloudFront distribution price class | `string` | `"PriceClass_100"` | no |
 | <a name="input_s3_log_bucket"></a> [s3\_log\_bucket](#input\_s3\_log\_bucket) | S3 bucket for logs | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) Map of key-value resource tags to associate with the resource. If configured with a provider default\_tags configuration block present, tags with matching keys will overwrite those defined at the provider-level. | `map(string)` | <pre>{<br>  "Name": "my-secure-s3-static-site"<br>}</pre> | no |
