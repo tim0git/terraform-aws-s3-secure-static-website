@@ -56,12 +56,12 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_cloudfront_dist_id"></a> [cloudfront\_dist\_id](#output\_cloudfront\_dist\_id) | n/a |
-| <a name="output_cloudfront_domain_name"></a> [cloudfront\_domain\_name](#output\_cloudfront\_domain\_name) | n/a |
-| <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | n/a |
-| <a name="output_s3_bucket_name"></a> [s3\_bucket\_name](#output\_s3\_bucket\_name) | n/a |
-| <a name="output_s3_domain_name"></a> [s3\_domain\_name](#output\_s3\_domain\_name) | n/a |
-| <a name="output_website_address"></a> [website\_address](#output\_website\_address) | n/a |
+| <a name="output_cloudfront_dist_id"></a> [cloudfront\_dist\_id](#output\_cloudfront\_dist\_id) | CloudFront Distribution ID |
+| <a name="output_cloudfront_domain_name"></a> [cloudfront\_domain\_name](#output\_cloudfront\_domain\_name) | CloudFront Domain Name |
+| <a name="output_s3_bucket_arn"></a> [s3\_bucket\_arn](#output\_s3\_bucket\_arn) | S3 Bucket ARN |
+| <a name="output_s3_bucket_name"></a> [s3\_bucket\_name](#output\_s3\_bucket\_name) | S3 Bucket Name |
+| <a name="output_s3_domain_name"></a> [s3\_domain\_name](#output\_s3\_domain\_name) | S3 Domain Name |
+| <a name="output_website_address"></a> [website\_address](#output\_website\_address) | Website Domain Name |
 <!-- END_TF_DOCS -->
 
 ### Example 1 Basic 
