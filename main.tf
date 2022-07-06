@@ -1,5 +1,5 @@
 locals {
-  logging_enabled           = var.s3_log_bucket != "" ? [{}] : []
+  logging_enabled           = var.s3_log_bucket != null ? [{}] : []
   geo_restrictions_enabled  = var.geo_restrictions != [] ? [{}] : []
   geo_restrictions_disabled = var.geo_restrictions != [] ? [] : [{}]
   default_certs             = var.use_default_domain ? ["default"] : []
