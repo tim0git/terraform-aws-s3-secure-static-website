@@ -1,5 +1,5 @@
 variable "domain_name" {
-  type = string
+  type        = string
   description = "domain name (or application name if no domain name available)"
 }
 
@@ -75,7 +75,7 @@ variable "aws_cloudfront_response_headers_policy_id" {
   description = "Arn of the response headers policy to add to the distribution"
 }
 
-variable "compress"{
+variable "compress" {
   type        = bool
   default     = true
   description = "Enable gzip compression"
@@ -83,8 +83,8 @@ variable "compress"{
 
 variable "lambda_function_associations" {
   type = list(object({
-    lambda_arn = string
-    event_type = string
+    lambda_arn   = string
+    event_type   = string
     include_body = bool
   }))
   default     = []
