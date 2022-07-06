@@ -71,7 +71,7 @@ resource "aws_s3_object" "s3_bucket" {
 }
 
 resource "aws_s3_bucket_logging" "s3_bucket" {
-  count  = local.logging_enabled ? 1 : 0
+  count  = length(local.logging_enabled)
   bucket = aws_s3_bucket.s3_bucket.id
 
   target_bucket = var.s3_log_bucket
