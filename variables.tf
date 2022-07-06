@@ -36,13 +36,13 @@ variable "geo_restrictions" {
 variable "cloudfront_logs_bucket" {
   type        = string
   default     = null
-  description = "S3 bucket for cloudfront logs : example-s3-access-logs"
+  description = "S3 bucket for cloudfront logs : example-cloudfront-logs.s3.eu-west-1.amazonaws.com"
 }
 
 variable "s3_access_logs_bucket" {
   type        = string
   default     = null
-  description = "S3 bucket for logs S3 access logs : example-cloudfront-logs.s3.eu-west-1.amazonaws.com"
+  description = "S3 bucket for logs S3 access logs : example-s3-access-logs"
 }
 
 variable "include_cookies" {
