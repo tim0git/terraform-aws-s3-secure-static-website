@@ -1,5 +1,4 @@
 variable "domain_name" {
-  default = ""
   type = string
   description = "domain name (or application name if no domain name available)"
 }
