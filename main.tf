@@ -17,6 +17,15 @@ resource "aws_s3_bucket" "s3_bucket" {
   tags   = var.tags
 }
 
+resource "aws_s3_bucket_versioning" "s3_bucket_versioning" {
+  bucket  = aws_s3_bucket.s3_bucket.id
+  enabled = true
+  versioning_configuration {
+    mfa_delete = false
+    status     = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_acl" "s3_bucket" {
   bucket = aws_s3_bucket.s3_bucket.id
   acl    = "private"
