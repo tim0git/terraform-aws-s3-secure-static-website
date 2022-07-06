@@ -1,5 +1,6 @@
 locals {
-  logging_enabled           = var.s3_log_bucket != null ? [{}] : []
+  cloudfront_logging_enabled = var.cloudfront_logs_bucket != null ? [{}] : []
+  s3_bucket_access_logging_enabled = var.s3_access_logs_bucket != null ? true : false
   geo_restrictions_enabled  = var.geo_restrictions != [] ? [{}] : []
   geo_restrictions_disabled = var.geo_restrictions != [] ? [] : [{}]
   default_certs             = var.use_default_domain ? ["default"] : []
@@ -13,7 +14,7 @@ provider "aws" {
 }
 
 resource "aws_kms_key" "s3_bucket_key" {
-  description             = "This key is used to website encrypt bucket objects"
+  description             = "This key is used to encrypt website bucket data"
   deletion_window_in_days = 7
   enable_key_rotation     = true
 }
@@ -71,10 +72,10 @@ resource "aws_s3_object" "s3_bucket" {
 }
 
 resource "aws_s3_bucket_logging" "s3_bucket" {
-  count  = length(local.logging_enabled)
+  count  = local.s3_bucket_access_logging_enabled ? 1 : 0
   bucket = aws_s3_bucket.s3_bucket.id
 
-  target_bucket = var.s3_log_bucket
+  target_bucket = var.s3_access_logs_bucket
   target_prefix = "s3-access-logs/${var.domain_name}"
 }
 
@@ -179,10 +180,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   dynamic "logging_config" {
-    for_each = local.logging_enabled
+    for_each = local.cloudfront_logging_enabled
     content {
       include_cookies = var.include_cookies
-      bucket          = var.s3_log_bucket
+      bucket          = var.cloudfront_logs_bucket
       prefix          = replace(join(", ", reverse(split(".", var.domain_name))), ", ", "/")
     }
   }
