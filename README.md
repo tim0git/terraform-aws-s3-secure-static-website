@@ -47,6 +47,7 @@ No modules.
 | <a name="input_aliases"></a> [aliases](#input\_aliases) | The domain names that you want to use as aliases for the distribution | `list(string)` | `[]` | no |
 | <a name="input_aws_cloudfront_response_headers_policy_id"></a> [aws\_cloudfront\_response\_headers\_policy\_id](#input\_aws\_cloudfront\_response\_headers\_policy\_id) | Arn of the response headers policy to add to the distribution | `string` | `null` | no |
 | <a name="input_aws_waf_arn"></a> [aws\_waf\_arn](#input\_aws\_waf\_arn) | The ID of the AWS WAF web ACL to associate with the distribution | `string` | `null` | no |
+| <a name="input_cloudfront_logs_bucket"></a> [cloudfront\_logs\_bucket](#input\_cloudfront\_logs\_bucket) | S3 bucket for cloudfront logs : example-cloudfront-logs.s3.eu-west-1.amazonaws.com | `string` | `null` | no |
 | <a name="input_compress"></a> [compress](#input\_compress) | Enable gzip compression | `bool` | `true` | no |
 | <a name="input_default_root_object"></a> [default\_root\_object](#input\_default\_root\_object) | Default root object | `string` | `"index.html"` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | domain name (or application name if no domain name available) | `string` | n/a | yes |
@@ -55,7 +56,7 @@ No modules.
 | <a name="input_include_cookies"></a> [include\_cookies](#input\_include\_cookies) | Include cookies in logs | `bool` | `false` | no |
 | <a name="input_lambda_function_associations"></a> [lambda\_function\_associations](#input\_lambda\_function\_associations) | The IDs of the Lambda functions to associate with the distribution | <pre>list(object({<br>    lambda_arn   = string<br>    event_type   = string<br>    include_body = bool<br>  }))</pre> | `[]` | no |
 | <a name="input_price_class"></a> [price\_class](#input\_price\_class) | CloudFront distribution price class | `string` | `"PriceClass_100"` | no |
-| <a name="input_s3_log_bucket"></a> [s3\_log\_bucket](#input\_s3\_log\_bucket) | S3 bucket for logs | `string` | `null` | no |
+| <a name="input_s3_access_logs_bucket"></a> [s3\_access\_logs\_bucket](#input\_s3\_access\_logs\_bucket) | S3 bucket for logs S3 access logs : example-s3-access-logs | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) Map of key-value resource tags to associate with the resource. If configured with a provider default\_tags configuration block present, tags with matching keys will overwrite those defined at the provider-level. | `map(string)` | <pre>{<br>  "Name": "my-secure-s3-static-site"<br>}</pre> | no |
 | <a name="input_upload_sample_file"></a> [upload\_sample\_file](#input\_upload\_sample\_file) | Upload sample html file to s3 bucket | `bool` | `false` | no |
 | <a name="input_use_default_domain"></a> [use\_default\_domain](#input\_use\_default\_domain) | Use default domain name | `bool` | `false` | no |
