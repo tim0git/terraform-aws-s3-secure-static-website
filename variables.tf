@@ -33,10 +33,16 @@ variable "geo_restrictions" {
   description = "restriction_type (Required) - The method that you want to use to restrict distribution of your content by country: none, whitelist, or blacklist. locations (Optional) - The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist)."
 }
 
-variable "s3_log_bucket" {
+variable "cloudfront_logs_bucket" {
   type        = string
   default     = null
-  description = "S3 bucket for logs"
+  description = "S3 bucket for cloudfront logs : example-s3-access-logs"
+}
+
+variable "s3_access_logs_bucket" {
+  type        = string
+  default     = null
+  description = "S3 bucket for logs S3 access logs : example-cloudfront-logs.s3.eu-west-1.amazonaws.com"
 }
 
 variable "include_cookies" {
