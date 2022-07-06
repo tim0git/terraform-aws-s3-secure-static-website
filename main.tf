@@ -56,6 +56,7 @@ resource "aws_route53_record" "route53_record" {
   }
 }
 
+#tfsec:ignore:aws-cloudfront-enable-logging - logging is dynamic and triggered by input variables.
 resource "aws_cloudfront_distribution" "s3_distribution" {
   aliases = local.domain_names
 
