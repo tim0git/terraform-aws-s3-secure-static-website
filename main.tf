@@ -12,6 +12,12 @@ provider "aws" {
   alias  = "aws_cloudfront"
 }
 
+resource "aws_kms_key" "s3_bucket_key" {
+  description             = "This key is used to website encrypt bucket objects"
+  deletion_window_in_days = 7
+  enable_key_rotation = true
+}
+
 resource "aws_s3_bucket" "s3_bucket" {
   bucket = var.domain_name
   tags   = var.tags
@@ -43,6 +49,17 @@ resource "aws_s3_object" "s3_bucket" {
   source       = "${path.module}/Resources/index.html"
   content_type = "text/html"
   etag         = filemd5("${path.module}/Resources/index.html")
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "s3_bucket" {
+  bucket = aws_s3_bucket.s3_bucket.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.s3_bucket_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
 }
 
 resource "aws_route53_record" "route53_record" {
