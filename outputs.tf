@@ -27,3 +27,8 @@ output "s3_bucket_name" {
   description = "S3 Bucket Name"
   value       = aws_s3_bucket.s3_bucket.id
 }
+
+output "s3_bucket_kms_key_alias" {
+  description = "KMS Key Alias"
+  value       = local.s3_bucket_key_alias
+}

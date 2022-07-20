@@ -1,23 +1,32 @@
 locals {
-  cloudfront_logging_enabled = var.cloudfront_logs_bucket != null ? [{}] : []
+  cloudfront_logging_enabled       = var.cloudfront_logs_bucket != null ? [{}] : []
   s3_bucket_access_logging_enabled = var.s3_access_logs_bucket != null ? true : false
-  geo_restrictions_enabled  = var.geo_restrictions != [] ? [{}] : []
-  geo_restrictions_disabled = var.geo_restrictions != [] ? [] : [{}]
-  default_certs             = var.use_default_domain ? ["default"] : []
-  acm_certs                 = var.use_default_domain ? [] : ["acm"]
-  domain_names              = concat([var.domain_name], var.aliases)
-  create_route53_records    = var.use_default_domain ? false : true
+  geo_restrictions_enabled         = var.geo_restrictions != [] ? [{}] : []
+  geo_restrictions_disabled        = var.geo_restrictions != [] ? [] : [{}]
+  default_certs                    = var.use_default_domain ? ["default"] : []
+  acm_certs                        = var.use_default_domain ? [] : ["acm"]
+  domain_names                     = concat([var.domain_name], var.aliases)
+  create_route53_records           = var.use_default_domain ? false : true
+  s3_bucket_key_alias              = "alias/${replace(var.domain_name, ".", "-")}"
 }
 
 provider "aws" {
-  region = "us-east-1"
-  alias  = "aws_cloudfront"
+  region  = "us-east-1"
+  alias   = "aws_cloudfront"
+  profile = var.aws_profile
 }
 
 resource "aws_kms_key" "s3_bucket_key" {
-  description             = "This key is used to encrypt website bucket data"
+  count                   = var.disable_bucket_encryption ? 0 : 1
+  description             = "This key is used to encrypt ${var.domain_name} bucket data"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+}
+
+resource "aws_kms_alias" "s3_bucket_key" {
+  count         = var.disable_bucket_encryption ? 0 : 1
+  name          = local.s3_bucket_key_alias
+  target_key_id = aws_kms_key.s3_bucket_key[count.index].key_id
 }
 
 resource "aws_s3_bucket" "s3_bucket" {
@@ -26,7 +35,7 @@ resource "aws_s3_bucket" "s3_bucket" {
 }
 
 resource "aws_s3_bucket_versioning" "s3_bucket_versioning" {
-  bucket  = aws_s3_bucket.s3_bucket.id
+  bucket = aws_s3_bucket.s3_bucket.id
   versioning_configuration {
     mfa_delete = "Disabled"
     status     = "Enabled"
@@ -53,11 +62,12 @@ resource "aws_s3_bucket_policy" "s3_bucket" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3_bucket" {
+  count  = var.disable_bucket_encryption ? 0 : 1
   bucket = aws_s3_bucket.s3_bucket.bucket
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.s3_bucket_key.arn
+      kms_master_key_id = aws_kms_key.s3_bucket_key[0].arn
       sse_algorithm     = "aws:kms"
     }
   }
@@ -238,7 +248,7 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
 }
 
 resource "aws_route53_record" "route53_record" {
-  count = local.create_route53_records ? length(local.domain_names): 0
+  count = local.create_route53_records ? length(local.domain_names) : 0
 
   depends_on = [
     aws_cloudfront_distribution.s3_distribution
