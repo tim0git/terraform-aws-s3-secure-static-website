@@ -183,9 +183,9 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
     response_headers_policy_id = var.aws_cloudfront_response_headers_policy_id
     viewer_protocol_policy     = "redirect-to-https"
-    min_ttl                    = 0
-    default_ttl                = 0
-    max_ttl                    = 0
+    min_ttl                    = var.default_root_object_cache_behaviour.min_ttl
+    default_ttl                = var.default_root_object_cache_behaviour.default_ttl
+    max_ttl                    = var.default_root_object_cache_behaviour.max_ttl
     compress                   = var.compress
     path_pattern               = "/${var.default_root_object}"
   }
