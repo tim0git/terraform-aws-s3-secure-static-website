@@ -113,12 +113,6 @@ variable "lambda_function_associations" {
   description = "The IDs of the Lambda functions to associate with the distribution"
 }
 
-variable "disable_bucket_encryption" {
-  type        = bool
-  default     = false
-  description = "Disable KMS bucket encryption, set this as true if you do not wish to use edge lambda for sigv4 signing of cloudfront requests to the s3 bucket"
-}
-
 variable "aws_profile" {
   type        = string
   nullable    = true

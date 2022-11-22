@@ -1,16 +1,16 @@
 output "cloudfront_domain_name" {
   description = "CloudFront Domain Name"
-  value       = aws_cloudfront_distribution.s3_distribution.domain_name
+  value       = aws_cloudfront_distribution.this.domain_name
 }
 
 output "cloudfront_dist_id" {
   description = "CloudFront Distribution ID"
-  value       = aws_cloudfront_distribution.s3_distribution.id
+  value       = aws_cloudfront_distribution.this.id
 }
 
 output "s3_domain_name" {
   description = "S3 Domain Name"
-  value       = aws_s3_bucket.s3_bucket.website_domain
+  value       = aws_s3_bucket_website_configuration.this.website_domain
 }
 
 output "website_address" {
@@ -20,15 +20,20 @@ output "website_address" {
 
 output "s3_bucket_arn" {
   description = "S3 Bucket ARN"
-  value       = aws_s3_bucket.s3_bucket.arn
+  value       = aws_s3_bucket.this.arn
 }
 
 output "s3_bucket_name" {
   description = "S3 Bucket Name"
-  value       = aws_s3_bucket.s3_bucket.id
+  value       = aws_s3_bucket.this.id
 }
 
 output "s3_bucket_kms_key_alias" {
   description = "KMS Key Alias"
-  value       = local.s3_bucket_key_alias
+  value       = aws_kms_alias.this.name
+}
+
+output "s3_bucket_kms_key_arn" {
+  description = "KMS Key ARN"
+  value       = aws_kms_key.this.arn
 }
