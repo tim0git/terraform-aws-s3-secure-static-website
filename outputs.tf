@@ -28,12 +28,3 @@ output "s3_bucket_name" {
   value       = aws_s3_bucket.this.id
 }
 
-output "s3_bucket_kms_key_alias" {
-  description = "KMS Key Alias"
-  value       = aws_kms_alias.this.name
-}
-
-output "s3_bucket_kms_key_arn" {
-  description = "KMS Key ARN"
-  value       = aws_kms_key.this.arn
-}
