@@ -1,6 +1,7 @@
 #tfsec:ignore:aws-cloudfront-enable-logging - logging is dynamic and triggered by input variables.
 resource "aws_cloudfront_distribution" "this" {
   aliases = local.domain_names
+  comment = "Cloudfront distribution for ${var.domain_name}"
 
   depends_on = [
     aws_s3_bucket.this
