@@ -44,51 +44,14 @@ data "aws_iam_policy_document" "s3_bucket_policy" {
   }
 }
 
-data "aws_iam_policy_document" "kms_key_policy" {
-  statement {
-    sid = "AllowCloudFrontServicePrincipalReadOnly"
-    principals {
-      type = "Service"
-      identifiers = [
-        "cloudfront.amazonaws.com"
-      ]
-    }
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-      ]
-    }
-    actions = [
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:GenerateDataKey*"
-    ]
-    resources = [
-      "*"
-    ]
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values = [
-        aws_cloudfront_distribution.this.arn,
-      ]
-    }
-  }
+data "aws_cloudfront_cache_policy" "managed_caching_optimized" {
+  name = "Managed-CachingOptimized"
+}
 
-  statement {
-    sid = "Enable IAM User Permissions"
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-      ]
-    }
-    actions = [
-      "kms:*",
-    ]
-    resources = [
-      "*"
-    ]
-  }
+data "aws_cloudfront_cache_policy" "managed_caching_disabled" {
+  name = "Managed-CachingDisabled"
+}
+
+data "aws_cloudfront_origin_request_policy" "managed_s3_origin_cors" {
+  name = "Managed-CORS-S3Origin"
 }
