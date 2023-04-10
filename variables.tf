@@ -82,28 +82,6 @@ variable "aws_cloudfront_response_headers_policy_id" {
   description = "Arn of the response headers policy to add to the distribution"
 }
 
-variable "compress" {
-  type        = bool
-  default     = true
-  description = "Enable gzip compression"
-}
-
-variable "default_root_object_cache_behaviour" {
-  type = object(
-    {
-      min_ttl     = number
-      max_ttl     = number
-      default_ttl = number
-    }
-  )
-  default = {
-    min_ttl     = 86400
-    default_ttl = 86400
-    max_ttl     = 86400
-  }
-  description = "Default root object cache behaviour"
-}
-
 variable "lambda_function_associations" {
   type = list(object({
     lambda_arn   = string
