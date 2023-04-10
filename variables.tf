@@ -92,6 +92,35 @@ variable "lambda_function_associations" {
   description = "The IDs of the Lambda functions to associate with the distribution"
 }
 
+variable "custom_error_responses" {
+  default = {
+    404 = {
+      response_code         = 200
+      error_caching_min_ttl = 0
+      response_page_path    = "/404.html"
+    }
+    403 = {
+      response_code         = 200
+      error_caching_min_ttl = 0
+      response_page_path    = "/"
+    }
+    400 = {
+      response_code         = 200
+      error_caching_min_ttl = 0
+      response_page_path    = "/"
+    }
+  }
+}
+
+variable "ordered_cache_behavior" {
+  type = list(object({
+    path_pattern  = string
+    cache_enabled = bool
+  }))
+  default = []
+  description = "Ordered cache behavior"
+}
+
 variable "aws_profile" {
   type        = string
   nullable    = true

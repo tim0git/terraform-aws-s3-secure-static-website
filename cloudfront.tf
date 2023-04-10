@@ -32,14 +32,6 @@ resource "aws_cloudfront_distribution" "this" {
 
     target_origin_id = "s3-cloudfront-origin-control"
 
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
-
     dynamic "lambda_function_association" {
       for_each = var.lambda_function_associations
       content {
@@ -51,48 +43,40 @@ resource "aws_cloudfront_distribution" "this" {
 
     response_headers_policy_id = var.aws_cloudfront_response_headers_policy_id
     viewer_protocol_policy     = "redirect-to-https"
-    min_ttl                    = 0
-    default_ttl                = 86400
-    max_ttl                    = 31536000
-    compress                   = var.compress
+    cache_policy_id            = data.aws_cloudfront_cache_policy.managed_caching_optimized.id
+    origin_request_policy_id   = data.aws_cloudfront_origin_request_policy.managed_s3_origin_cors.id
   }
-  ordered_cache_behavior {
-    allowed_methods = [
-      "GET",
-      "HEAD",
-    ]
 
-    cached_methods = [
-      "GET",
-      "HEAD",
-    ]
+  dynamic "ordered_cache_behavior" {
+    for_each = var.ordered_cache_behavior
+    content {
+      allowed_methods = [
+        "GET",
+        "HEAD",
+      ]
 
-    target_origin_id = "s3-cloudfront-origin-control"
+      cached_methods = [
+        "GET",
+        "HEAD",
+      ]
 
-    forwarded_values {
-      query_string = false
+      target_origin_id = "s3-cloudfront-origin-control"
 
-      cookies {
-        forward = "none"
+      dynamic "lambda_function_association" {
+        for_each = var.lambda_function_associations
+        content {
+          event_type   = lambda_function_association.value.event_type
+          lambda_arn   = lambda_function_association.value.lambda_arn
+          include_body = lambda_function_association.value.include_body
+        }
       }
-    }
 
-    dynamic "lambda_function_association" {
-      for_each = var.lambda_function_associations
-      content {
-        event_type   = lambda_function_association.value.event_type
-        lambda_arn   = lambda_function_association.value.lambda_arn
-        include_body = lambda_function_association.value.include_body
-      }
+      response_headers_policy_id = var.aws_cloudfront_response_headers_policy_id
+      viewer_protocol_policy     = "redirect-to-https"
+      cache_policy_id            = ordered_cache_behavior.value.cache_enabled ? data.aws_cloudfront_cache_policy.managed_caching_optimized.id : data.aws_cloudfront_cache_policy.managed_caching_disabled.id
+      origin_request_policy_id   = data.aws_cloudfront_origin_request_policy.managed_s3_origin_cors.id
+      path_pattern               = ordered_cache_behavior.value.path_pattern
     }
-
-    response_headers_policy_id = var.aws_cloudfront_response_headers_policy_id
-    viewer_protocol_policy     = "redirect-to-https"
-    min_ttl                    = var.default_root_object_cache_behaviour.min_ttl
-    default_ttl                = var.default_root_object_cache_behaviour.default_ttl
-    max_ttl                    = var.default_root_object_cache_behaviour.max_ttl
-    compress                   = var.compress
-    path_pattern               = "/${var.default_root_object}"
   }
 
   dynamic "logging_config" {
@@ -138,11 +122,14 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
-  custom_error_response {
-    error_code            = 403
-    response_code         = 200
-    error_caching_min_ttl = 0
-    response_page_path    = "/"
+  dynamic "custom_error_response" {
+    for_each = var.custom_error_responses
+    content {
+      error_code            = custom_error_response.key
+      response_code         = custom_error_response.value.response_code
+      error_caching_min_ttl = custom_error_response.value.error_caching_min_ttl
+      response_page_path    = custom_error_response.value.response_page_path
+    }
   }
 
   tags = var.tags
